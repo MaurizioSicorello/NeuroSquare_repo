@@ -76,16 +76,10 @@ IAPS_train_z = rescale(IAPS_train, 'zscoreimages');
 
 % TO DO: build nested PLS code with parameter optimization
 
+% get number of subjects and subject id
 [~,~,subject_id] = unique(IAPS_train_z.metadata_table.subject_id,'stable');
 uniq_subject_id = unique(subject_id);
 n_subj = length(uniq_subject_id);
-
-% make indicator for stratified hold-out set [my code]
-% kfolds = 5;
-% cv = stratified_holdout_set(IAPS_train.Y, 5);
-% [I,J] = find([cv.teIdx{1},cv.teIdx{2}, cv.teIdx{3}, cv.teIdx{4}, cv.teIdx{5}]);
-% fold_labels = sortrows([I,J]);
-% fold_labels = fold_labels(:,2);
 
 % make indicator for stratified hold-out set [bogdan's code]
 kfolds = 5;
@@ -94,37 +88,46 @@ cv = cvpartition2(ones(size(IAPS_train_z.dat,2),1), 'KFOLD', kfolds, 'Stratify',
 fold_labels = sortrows([I,J]);
 fold_labels = fold_labels(:,2);
 
-
-% predict
-[cverr, stats, optional_outputs] = predict(IAPS_train_z, 'algorithm_name', 'cv_pls', 'numcomponents', 5, 'nfolds', fold_labels);
-
-r = IAPS_train_z.predict('algorithm_name', 'cv_pls', 'numcomponents', 5, 'nfolds', fold_labels, ...
-        'verbose',0, 'subjIDs', subject_id, 'error_type','r')
-
-
 % define hyperparameter search space by finding maximum df you'll have for
 % any training fold
 max_subj_per_fold = length(IAPS_train_z.Y) - floor(length(IAPS_train_z.Y)/5);
 min_subj_per_fold = length(IAPS_train_z.Y) - ceil(length(IAPS_train_z.Y)/5);
 minTrainingSize = length(fold_labels) - max(accumarray(fold_labels,1));
 
-dims_bt = optimizableVariable('btDims', [0, min_subj_per_fold - 1], 'Type', 'integer');
+% optimize number of components
+x = optHyperpar(IAPS_train_z, 'cv_pls', 0, min_subj_per_fold - 1, 'integer', 4).XAtMinObjective{1,1};
+x = optHyperpar(IAPS_train_z, 'cv_pls', 0, 3, 'integer', 4).XAtMinObjective{1,1};
 
-constraint=@(x1)(x1.btDims > 0);
 
-objfxn = @(dims1)(lossEst(dims1, IAPS_train_z));
+% k-fold cross-validation
+kfolds = 5;
+cv = cvpartition2(ones(size(IAPS_train_z.dat,2),1), 'KFOLD', kfolds, 'Stratify', subject_id);
+[I,J] = find([cv.test(1),cv.test(2), cv.test(3), cv.test(4), cv.test(5)]);
+fold_labels = sortrows([I,J]);
+fold_labels = fold_labels(:,2);
 
-if ~isempty(gcp('nocreate'))
-    delete(gcp('nocreate'));
+cv_results = zeros(5,2);
+
+for i = 1:kfolds
+
+    % split training and test data
+    trainDat = get_wh_image(IAPS_train_z, fold_labels ~= i);
+    testDat = get_wh_image(IAPS_train_z, fold_labels == i);
+    
+    % estimate optimal hyperparameter in an inner cv-loop
+    optNumComp = optHyperpar(trainDat, 'cv_pls', 0, 3, 'integer', 4).XAtMinObjective{1,1};
+    
+    % use optimal hyperparameter to build model on whole draining data and
+    % apply to test data
+    [cverr, stats, optout] = predict(trainDat, 'algorithm_name', 'cv_pls', 'numcomponents', optNumComp, 'nfolds', 1);
+    pattern_weights = stats.weight_obj;
+    [pattern_exp_values] = apply_mask(testDat, pattern_weights, 'pattern_expression', 'ignore_missing');
+    cv_results(i,1) = corr(testDat.Y, pattern_exp_values);
+    cv_results(i,2) = optNumComp;
+    
 end
-parpool(4)
-hp_mlpcr = bayesopt(objfxn,[dims_bt],'XConstraintFcn',constraint,...
-    'AcquisitionFunctionName','expected-improvement-plus','MaxObjectiveEvaluations',30,...
-    'UseParallel',1);
 
+% average fisher-transformed correlation accuracy and transform back to r
+tanh(mean(atanh(cv_results(:,1))))
 
-lossEst(dims_bt.btDims, IAPS_train_z)
-objfxn(dims_bt)
-
-
-
+[r, hyp] = nestedCrossVal(IAPS_train_z, 'cv_pls', 0, 3, 'integer', 4, 5)
