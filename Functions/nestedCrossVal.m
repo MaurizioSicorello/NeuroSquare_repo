@@ -1,6 +1,23 @@
-% changes: probably start worker pool outside loop
+% NESTED CROSS-VALIDATION WITH BAYESIAN PARAMETER OPTIMIZATION
 
+% INPUTS:
+% data: fmri_data object
+% ML_alg: name of machine learning algorithm to use in the canlab predict
+% function
+% min: Minimum of hyperparameter space to search
+% max: Minimum of hyperparameter space to search
+% num_res: numeric resolution of hyperparameter space (e.g. integer for pls)
+% numWorkers: number of workers for parallel computing
+% numFolds: number of outer folds
+
+% OUTPUTS:
+% r: cross-validated correlation between predicted and observed
+% hyp: optimal hyperparameter determined in inner cross-validation
 % outer cross-validation loop
+
+% TO DO: probably start worker pool outside loop
+
+
 function [r, hyp] = nestedCrossVal(data, ML_alg, min, max, num_res, numWorkers, numFolds)
 
     % get subject ID from fMRI_data 
