@@ -59,75 +59,39 @@ cd('../Subject-level-maps')
 IAPS_train = get_wh_image(IAPS_all_compl, xor(holdoutIndex.trainIndex_bin, 0));
 IAPS_test = get_wh_image(IAPS_all_compl, xor(holdoutIndex.testIndex_bin, 0));
 
+% test prediction [maybe important: predict appears to center the outcome]
+[cverr, stats, optional_outputs] = predict(IAPS_train, 'algorithm_name', 'cv_pcr', 'numcomponents', 200, 'nfolds', 1);
+% [pattern_exp_values] = apply_mask(IAPS_train, stats.weight_obj, 'pattern_expression', 'ignore_missing')
+% corr(IAPS_train.Y, pattern_exp_values)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% predict on raw data
+
+% use main function on raw data [error in apply_mask for some reason. works
+% after the rescale function is applied]
+[r, hyp] = nestedCrossVal(IAPS_train, 'cv_pls', 0, 2, 'integer', 4, 5)
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% predict on cross-sectionally z-scored data
+
 % standardize IVs and DVs cross-sectionally
 % performance even worse after scaling. don't understand why
-IAPS_train = rescale(IAPS_train, 'zscorevoxels');
-IAPS_train.Y = zscore(IAPS_train.Y);
+IAPS_train_z = rescale(IAPS_train, 'zscorevoxels');
+IAPS_train.Y = zscore(IAPS_train_z.Y);
+%predict
+[r, hyp] = nestedCrossVal(IAPS_train_z, 'cv_pls', 0, 2, 'integer', 4, 5)
 
-% predict
-[cverr, stats, optional_outputs] = predict(IAPS_train, 'algorithm_name', 'cv_pls', 'numcomponents', 50);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% predict on cross-sectionally and image-wise z-scored data
 
 % image-wise standardization
-IAPS_train_z = rescale(IAPS_train, 'zscoreimages');
-
+IAPS_train_z2 = rescale(IAPS_train_z, 'zscoreimages');
 % predict
-[cverr, stats, optional_outputs] = predict(IAPS_train_z, 'algorithm_name', 'cv_pls', 'numcomponents', 50);
+[r, hyp] = nestedCrossVal(IAPS_train_z, 'cv_pls', 0, 2, 'integer', 4, 5)
 
 
-% TO DO: build nested PLS code with parameter optimization
-
-% get number of subjects and subject id
-[~,~,subject_id] = unique(IAPS_train_z.metadata_table.subject_id,'stable');
-uniq_subject_id = unique(subject_id);
-n_subj = length(uniq_subject_id);
-
-% make indicator for stratified hold-out set [bogdan's code]
-kfolds = 5;
-cv = cvpartition2(ones(size(IAPS_train_z.dat,2),1), 'KFOLD', kfolds, 'Stratify', subject_id);
-[I,J] = find([cv.test(1),cv.test(2), cv.test(3), cv.test(4), cv.test(5)]);
-fold_labels = sortrows([I,J]);
-fold_labels = fold_labels(:,2);
-
-% define hyperparameter search space by finding maximum df you'll have for
-% any training fold
-max_subj_per_fold = length(IAPS_train_z.Y) - floor(length(IAPS_train_z.Y)/5);
-min_subj_per_fold = length(IAPS_train_z.Y) - ceil(length(IAPS_train_z.Y)/5);
-minTrainingSize = length(fold_labels) - max(accumarray(fold_labels,1));
-
-% optimize number of components
-x = optHyperpar(IAPS_train_z, 'cv_pls', 0, min_subj_per_fold - 1, 'integer', 4).XAtMinObjective{1,1};
-x = optHyperpar(IAPS_train_z, 'cv_pls', 0, 3, 'integer', 4).XAtMinObjective{1,1};
-
-
-% k-fold cross-validation
-kfolds = 5;
-cv = cvpartition2(ones(size(IAPS_train_z.dat,2),1), 'KFOLD', kfolds, 'Stratify', subject_id);
-[I,J] = find([cv.test(1),cv.test(2), cv.test(3), cv.test(4), cv.test(5)]);
-fold_labels = sortrows([I,J]);
-fold_labels = fold_labels(:,2);
-
-cv_results = zeros(5,2);
-
-for i = 1:kfolds
-
-    % split training and test data
-    trainDat = get_wh_image(IAPS_train_z, fold_labels ~= i);
-    testDat = get_wh_image(IAPS_train_z, fold_labels == i);
-    
-    % estimate optimal hyperparameter in an inner cv-loop
-    optNumComp = optHyperpar(trainDat, 'cv_pls', 0, 3, 'integer', 4).XAtMinObjective{1,1};
-    
-    % use optimal hyperparameter to build model on whole draining data and
-    % apply to test data
-    [cverr, stats, optout] = predict(trainDat, 'algorithm_name', 'cv_pls', 'numcomponents', optNumComp, 'nfolds', 1);
-    pattern_weights = stats.weight_obj;
-    [pattern_exp_values] = apply_mask(testDat, pattern_weights, 'pattern_expression', 'ignore_missing');
-    cv_results(i,1) = corr(testDat.Y, pattern_exp_values);
-    cv_results(i,2) = optNumComp;
-    
-end
-
-% average fisher-transformed correlation accuracy and transform back to r
-tanh(mean(atanh(cv_results(:,1))))
-
-[r, hyp] = nestedCrossVal(IAPS_train_z, 'cv_pls', 0, 3, 'integer', 4, 5)
