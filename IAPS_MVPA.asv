@@ -93,11 +93,11 @@ IAPS_train_z = rescale(IAPS_train, 'zscorevoxels');
 IAPS_train_z.Y = zscore(IAPS_train_z.Y);
 
 % predict
-[r, fullOutputs] = nestedCrossValRepeat(IAPS_train_z, 'cv_pls', 0, 1, 'integer', kfoldsOuter, repeats, subject_id, numWorkers);
+[r, fullOutputs] = nestedCrossValRepeat(IAPS_train, 'cv_pls', 0, 1, 'integer', kfoldsOuter, repeats, subject_id, numWorkers);
 
 % save
 cd('../../Results')
-save IAPS_pls_z_nested.mat r fullOutputs
+save IAPS_pls_z_nested.mat r foldwise fullOutput
 cd('../Data/Subject-level-maps')
 
 
@@ -107,13 +107,14 @@ cd('../Data/Subject-level-maps')
 % image-wise standardization
 IAPS_train_z2 = rescale(IAPS_train_z, 'zscoreimages');
 
-% predict
-[r, fullOutputs] = nestedCrossValRepeat(IAPS_train_z2, 'cv_pls', 0, 1, 'integer', kfoldsOuter, repeats, subject_id, numWorkers);
+% start parallel pool
+if ~isempty(gcp('nocreate'))
+        delete(gcp('nocreate'));
+end
+parpool(numWorkers)
 
-% save
-cd('../../Results')
-save IAPS_pls_z2_nested.mat r fullOutputs
-cd('../Data/Subject-level-maps')
+% predict
+[r, foldwise, fullOutput] = nestedCrossVal(IAPS_train_z, 'cv_pls', 0, 1, 'integer', 2, subject_id)
 
 
 
