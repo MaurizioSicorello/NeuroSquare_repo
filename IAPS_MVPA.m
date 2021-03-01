@@ -5,8 +5,8 @@
 % go to directory 'subject-level-maps' as the base directory
 
 % settings
-numWorkers = 4; % for parallel computing
-kfoldsOuter = 2;
+numWorkers = 5; % for parallel computing
+kfoldsOuter = 5;
 repeats = 2;
 
 % example image for the paradigm of interest
@@ -71,13 +71,13 @@ IAPS_test = get_wh_image(IAPS_all_compl, xor(holdoutIndex.testIndex_bin, 0));
 
 % get subject ID from fMRI_data training set
 [~,~,subject_id] = unique(IAPS_train.metadata_table.subject_id,'stable');
-
+maxPlsComps = floor(length(subject_id)*(4/5)^2)-1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % predict on raw data
 
 % predict
-[r, fullOutputs] = nestedCrossValRepeat(IAPS_train, 'cv_pls', 0, 1, 'integer', kfoldsOuter, repeats, subject_id, numWorkers);
+[r, fullOutputs] = nestedCrossValRepeat(IAPS_train, 'cv_pls', 0, maxPlsComps, 'integer', kfoldsOuter, repeats, subject_id, numWorkers);
 
 % save
 cd('../../Results')
@@ -93,7 +93,7 @@ IAPS_train_z = rescale(IAPS_train, 'zscorevoxels');
 IAPS_train_z.Y = zscore(IAPS_train_z.Y);
 
 % predict
-[r, fullOutputs] = nestedCrossValRepeat(IAPS_train_z, 'cv_pls', 0, 1, 'integer', kfoldsOuter, repeats, subject_id, numWorkers);
+[r, fullOutputs] = nestedCrossValRepeat(IAPS_train_z, 'cv_pls', 0, maxPlsComps, 'integer', kfoldsOuter, repeats, subject_id, numWorkers);
 
 % save
 cd('../../Results')
@@ -108,7 +108,7 @@ cd('../Data/Subject-level-maps')
 IAPS_train_z2 = rescale(IAPS_train_z, 'zscoreimages');
 
 % predict
-[r, fullOutputs] = nestedCrossValRepeat(IAPS_train_z2, 'cv_pls', 0, 1, 'integer', kfoldsOuter, repeats, subject_id, numWorkers);
+[r, fullOutputs] = nestedCrossValRepeat(IAPS_train_z2, 'cv_pls', 0, maxPlsComps, 'integer', kfoldsOuter, repeats, subject_id, numWorkers);
 
 % save
 cd('../../Results')
