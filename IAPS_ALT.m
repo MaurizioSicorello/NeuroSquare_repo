@@ -120,6 +120,7 @@ for i=1:nPerm
     BPerm = TreeBagger(1000, M, permY, 'Method', 'regression', 'OOBPrediction', 'On');
     outPerm(i) = corr(permY, oobPredict(BPerm));
     
+    fprintf('Iteration #%d\n', i);
 end
 
 % save permutation predictions
@@ -253,7 +254,7 @@ IAPS_test = get_wh_image(IAPS_all_compl, xor(holdoutIndex.testIndex_bin, 0));
 numWorkers = 5; % for parallel computing
 kfoldsOuter = 5;
 repeats = 2;
-maxPlsComps = floor(size(IAPS_all_compl.dat,2)*(4/5)^2)-1;
+maxPlsComps = floor(size(IAPS_train.dat,2)*(4/5)^2)-1;
 
 
 %%%%%%%%%%%%%
