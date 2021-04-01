@@ -54,10 +54,15 @@ IAPS_age_compl.Y = zscore(IAPS_age_compl.Y);
 IAPS_age_compl = rescale(IAPS_age_compl, 'zscorevoxels');
 IAPS_age_compl = rescale(IAPS_age_compl, 'zscoreimages');
 
-[cverr, stats, optional_outputs] = predict(IAPS_age_compl, 'cv_pcr', 'ncomp', 179*4/5-1)
+[cverr, stats, optional_outputs] = predict(IAPS_age_grey, 'cv_pcr', 'ncomp', 179*4/5-1)
 
-out = regress(IAPS_age_compl);
-out_fdr = threshold(out.t, .05, 'fdr');
+mask = which('gray_matter_mask.img')
+maskdat = fmri_data(mask, 'noverbose');
+IAPS_age_grey = apply_mask(IAPS_age_compl, maskdat);
+
+
+out = regress(IAPS_age_grey);
+out_fdr = threshold(out.t, .001, 'unc', 'k', 20);
 out_fdr = select_one_image(out_fdr, 1);
 %orthviews(out_fdr)
 

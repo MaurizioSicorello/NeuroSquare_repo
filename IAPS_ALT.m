@@ -125,10 +125,13 @@ end
 
 % save permutation predictions
 cd('..\..\Results')
-save IAPS_RFpermutation_raw.mat nPerm
+save IAPS_RFpermutation_raw.mat outPerm
 cd('..\Data\Subject-level-maps')
 
 % p-value for random forest prediction
+cd('..\..\Results')
+load('IAPS_RFpermutation_raw.mat')
+cd('..\Data\Subject-level-maps')
 sum(outPerm >= corr(IAPS_all_compl.Y,oobPredict(B)))/nPerm
 
 
