@@ -17,7 +17,7 @@ testMode_k = 20; % number of features
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % list of algorithms to use
-ML_algorithm = ["cv_pls", "cv_pcr" , "cv_svm", "oob_rf"];
+ML_algorithm = ["cv_pcr" , "cv_svm", "oob_rf", "cv_pls"];
 % ML_algorithm = ["cv_pcr" , "cv_svm", "oob_rf"];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,11 +41,11 @@ cd('Data')
 AHAB2_quest = readtable('AHAB2_psychVars_deidentified');
 PIP_quest = readtable('PIP_psychVars_deidentified');
 
-AHAB2_vars = AHAB2_quest(:,{'id', 'NEON', 'NEON1', 'NEON2', 'NEON3', 'NEON4', 'NEON5', 'NEON6', 'NEONX', 'ER_LookDiff', 'pnsx_pa', 'pnsx_na', 'STAI', 'BDI_TOT'});
-PIP_vars = PIP_quest(:,{'id', 'neoN', 'neoN1', 'neoN2', 'neoN3', 'neoN4', 'neoN5', 'neoN6', 'NEONX_empty', 'ER_LookDiff', 'PA_rescale', 'NA_rescale', 'Trait_Anxiety', 'BDI_total'});
+AHAB2_vars = AHAB2_quest(:,{'id', 'ER_LookDiff', 'pnsx_pa', 'pnsx_na', 'STAI', 'BDI_TOT', 'NEON', 'NEON1', 'NEON2', 'NEON3', 'NEON4', 'NEON5', 'NEON6', 'NEONX'});
+PIP_vars = PIP_quest(:,{'id', 'ER_LookDiff', 'PA_rescale', 'NA_rescale', 'Trait_Anxiety', 'BDI_total', 'neoN', 'neoN1', 'neoN2', 'neoN3', 'neoN4', 'neoN5', 'neoN6', 'NEONX_empty'});
 
 All_Y = array2table([AHAB2_vars{:,:}; PIP_vars{:,:}], 'VariableNames', ...
-   {'id', 'neoN', 'neoN1', 'neoN2', 'neoN3', 'neoN4', 'neoN5', 'neoN6', 'NEONX', 'ER_LookDiff', 'PA', 'NA', 'STAI', 'BDI'});
+   {'id', 'ER_LookDiff', 'PA', 'NA', 'STAI', 'BDI', 'neoN', 'neoN1', 'neoN2', 'neoN3', 'neoN4', 'neoN5', 'neoN6', 'NEONX'});
 
 % AHAB2_vars = AHAB2_quest(:,{'id', 'NEON', 'NEONX', 'ER_LookDiff'});
 % PIP_vars = PIP_quest(:,{'id', 'neoN', 'NEONX_empty', 'ER_LookDiff'});

@@ -1,7 +1,7 @@
 cd('Results/Multiverse_Loop')
 
 % list model names in results folder
-modelNames = dir('*.mat');
+modelNames = dir('ER_LookDiff*.mat');
 
 % check dimensions of model results
 testModel = load(modelNames(1).name).fullOutputs;
