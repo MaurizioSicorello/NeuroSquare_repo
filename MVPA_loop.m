@@ -7,7 +7,7 @@
 numWorkers = 4; % for parallel computing
 kfoldsOuter = 5;
 repeats = 2;
-onlyUseTrainData = true;
+onlyUseTrainData = false;
 
 % settings for testing the loop
 testMode = false;
@@ -22,13 +22,9 @@ ML_algorithm = ["cv_pcr" , "cv_svm", "oob_rf", "cv_pls"];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % scaling options to try
-<<<<<<< Updated upstream
 scale_opt = ["zscoreimages", "centerimages", "nocen"];
 % scale_opt = "zscoreimages";
-=======
-%scale_opt = ["zscoreimages", "centerimages", "nocen"];
-scale_opt = "zscoreimages";
->>>>>>> Stashed changes
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % example images of fMRI data
