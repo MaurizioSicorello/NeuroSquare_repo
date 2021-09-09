@@ -61,8 +61,6 @@ hist(df$cvCorr)
 dfMean <- unique(df[, -which(names(df) == "cvCorr" | names(df) == "optHyperPar")])
 names(dfMean)[which(names(dfMean) == "meanCorr")] <- "cvCorr"
 
-outcome = "ERLookDiff"
-
 
 plotMultiverse <- function(outcome){
   
@@ -85,6 +83,6 @@ plotMultiverse("neoN")
 plotMultiverse("NA")
 plotMultiverse("PA")
 plotMultiverse("STAI")
+plotMultiverse("neoN1")
+plotMultiverse("neoN2")
 
-
-# PLOT MEANS AND SORT X-AXIS FOR SIZE
