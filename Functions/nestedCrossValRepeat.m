@@ -103,7 +103,7 @@ function optimalNcomp = optHyperpar(dat, ML_alg, min, max, num_res, subject_id_i
 
    optimalNcomp = bayesopt(objfxn,[dims_bt],'XConstraintFcn',constraint,...
         'AcquisitionFunctionName','expected-improvement-plus','MaxObjectiveEvaluations',30,...
-        'UseParallel',1, 'PlotFcn', []);
+        'UseParallel',0, 'PlotFcn', []);
 end 
 
 
