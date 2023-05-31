@@ -9,7 +9,7 @@ p_load(here, R.matlab, stringr, plyr, ggplot2)
 #####################################
 # read data
 
-filenames <- list.files(here::here("Results", "Multiverse_Loop"))
+filenames <- list.files(here::here(wd, "Results", "Multiverse_Loop"))
 
 # number of repeats and folds
 exampleFile <- readMat(here::here(wd, "Results", "Multiverse_Loop", filenames[1]))
@@ -47,6 +47,8 @@ names(df) <- c("outcome", "data", "contrast", "trainsVsFull", "masking", "rescal
 
 # set negative correlations to 0
 df$cvCorr <- as.numeric(ifelse(df$cvCorr < 0, 0, df$cvCorr))
+
+df$cvCorr <- as.numeric(df$cvCorr)
 
 # calculate mean correlation per model (including fisher z transformation)
 df <- ddply(df, c("outcome", "data", "contrast", "trainsVsFull", "masking", "rescale", "cv", "algorithm"), transform, meanCorr = tanh(mean(atanh(cvCorr))))
