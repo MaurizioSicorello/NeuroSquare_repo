@@ -1,13 +1,13 @@
 % CHANGES WORKING DIRECTORY RELATIVE TO SCRIPT LOCATION!
 
-% TO DO: make testrun of loop, add neurosynth masking
+% TO DO: add neurosynth masking
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % manual settings
-numWorkers = 4; % for parallel computing
+numWorkers = 3; % for parallel computing
 kfoldsOuter = 5;
 repeats = 2;
-onlyUseTrainData = false;
+onlyUseTrainData = true;
 
 % settings for testing the loop
 testMode = false;
@@ -48,11 +48,9 @@ PIP_vars = PIP_quest(:,{'id', 'ER_LookDiff', 'PA_rescale', 'NA_rescale', 'Trait_
 All_Y = array2table([AHAB2_vars{:,:}; PIP_vars{:,:}], 'VariableNames', ...
    {'id', 'ER_LookDiff', 'PA', 'NA', 'STAI', 'BDI', 'neoN', 'neoN1', 'neoN2', 'neoN3', 'neoN4', 'neoN5', 'neoN6', 'NEONX'});
 
-% AHAB2_vars = AHAB2_quest(:,{'id', 'NEON', 'NEONX', 'ER_LookDiff'});
-% PIP_vars = PIP_quest(:,{'id', 'neoN', 'NEONX_empty', 'ER_LookDiff'});
-% 
-% All_Y = array2table([AHAB2_vars{:,:}; PIP_vars{:,:}], 'VariableNames', ...
-%    {'id', 'neoN', 'NEONX', 'ER_LookDiff'});
+
+%%%%% NOTE: not all model ouputs exist for neoN2_train. Do it after all
+%%%%% full data models are conducted!
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -180,19 +178,7 @@ for i=2:size(All_Y, 2)
                     if testMode == true
                         subject_id = [1:testMode_N]';
                     else
-                        [~,~,subject_id] = unique(fMRI_all_scaled.metadata_table.subject_id,'stable')
-                    end
-                    
-
-                    if ML_algorithm(m) == 'oob_rf'
-                        [r, fullOutputs] = cv_ranfor_repeat(fMRI_all_scaled, kfoldsOuter, repeats, 1000, numWorkers, true, subject_id)
-                        
-                    elseif ML_algorithm(m) == 'cv_svm'
-                        [r, fullOutputs] = cv_svm_repeat(fMRI_all_scaled, kfoldsOuter, repeats, subject_id)
-                        
-                    else
-                        maxComps = floor(length(subject_id)*((kfoldsOuter-1)/kfoldsOuter)^2)-1;
-                        [r, fullOutputs] = nestedCrossValRepeat(fMRI_all_scaled, char(ML_algorithm(m)), 1, maxComps, 'integer', kfoldsOuter, repeats, subject_id, 4);     
+                        [~,~,subject_id] = unique(fMRI_all_scaled.metadata_table.subject_id,'stable');
                     end
                     
                     % output label of model
@@ -205,8 +191,30 @@ for i=2:size(All_Y, 2)
                             ML_algorithm(m), '.mat');
                     outLabel = char(outLabel);
                     
+                    % calculate model if it doesn't already exist
+                    disp(['CALCULATING THE FOLLOWING MODEL: ', outLabel])
                     cd('../../Results/Multiverse_Loop')
-                    save(outLabel, 'r', 'fullOutputs')
+                    if isfile(outLabel) ~= 1
+                        
+                        if ML_algorithm(m) == 'oob_rf'
+                        [r, fullOutputs] = cv_ranfor_repeat(fMRI_all_scaled, kfoldsOuter, repeats, 1000, numWorkers, true, subject_id)
+                        
+                        elseif ML_algorithm(m) == 'cv_svm'
+                        [r, fullOutputs] = cv_svm_repeat(fMRI_all_scaled, kfoldsOuter, repeats, subject_id)
+                        
+                        else
+                        maxComps = floor(length(subject_id)*((kfoldsOuter-1)/kfoldsOuter)^2)-1;
+                        [r, fullOutputs] = nestedCrossValRepeat(fMRI_all_scaled, char(ML_algorithm(m)), 1, maxComps-1, 'integer', kfoldsOuter, repeats, subject_id, 4);     
+                        end
+                        
+                        % save model
+                        save(outLabel, 'r', 'fullOutputs')
+                        
+                    else
+                        disp('MODEL ALREADY EXISTS IN RESULTS FOLDER. SKIPPING TO NEXT MODEL')
+                        
+                    end
+                   
                     cd('../../Data/Subject-level-maps')
                     
                 end
