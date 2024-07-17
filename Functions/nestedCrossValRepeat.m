@@ -24,12 +24,14 @@
 
 % Function for repeated nested cross-validation
 function [r, fullOutputs] = nestedCrossValRepeat(data, ML_alg, min, max, num_res, numFolds, repeats, subject_id, numWorkers)
-
-    % start parallel pool
-    if ~isempty(gcp('nocreate'))
-            delete(gcp('nocreate'));
+    
+    if numWorkers > 0
+        % start parallel pool
+        if ~isempty(gcp('nocreate'))
+                delete(gcp('nocreate'));
+        end
+        parpool(numWorkers)
     end
-    parpool(numWorkers)
 
     % create vector and structure to collect outputs
     repeated_cv_results = zeros(repeats, 1);

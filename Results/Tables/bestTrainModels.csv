@@ -1,0 +1,15 @@
+"outcome","data","contrast","trainsVsFull","masking","rescale","cv","algorithm","modelDescr","cvCorr"
+"BDI","IAPS","LookNeg-vs-LookNeut","train","GM","zscor","oob","rf","BDI_IAPS_LookNeg-vs-LookNeut_train_GM_zscor_oob_rf",0.184304411562393
+"ERLookDiff","IAPS","LookNeg-vs-LookNeut","train","GM","zscor","cv","pcr","ERLookDiff_IAPS_LookNeg-vs-LookNeut_train_GM_zscor_cv_pcr",0.236970456524413
+"NA","IAPS","LookNeg-vs-LookNeut","train","GM","nocen","cv","pcr","NA_IAPS_LookNeg-vs-LookNeut_train_GM_nocen_cv_pcr",0.150608413991133
+"neoN","IAPS","LookNeg-vs-Baseline","train","GM","nocen","oob","rf","neoN_IAPS_LookNeg-vs-Baseline_train_GM_nocen_oob_rf",0.172268309868986
+"neoN1","PFA","Faces-vs-Shapes","train","GM","zscor","cv","pcr","neoN1_Faces-PFA_Faces-vs-Shapes_train_GM_zscor_cv_pcr",0.171960882700135
+"neoN2","IAPS","LookNeg-vs-Baseline","train","GM","cente","oob","rf","neoN2_IAPS_LookNeg-vs-Baseline_train_GM_cente_oob_rf",0.228905418202676
+"neoN3","IAPS","LookNeg-vs-LookNeut","train","GM","zscor","cv","pcr","neoN3_IAPS_LookNeg-vs-LookNeut_train_GM_zscor_cv_pcr",0.169109607494328
+"neoN4","IAPS","LookNeg-vs-Baseline","train","GM","nocen","cv","pcr","neoN4_IAPS_LookNeg-vs-Baseline_train_GM_nocen_cv_pcr",0.131993987402204
+"neoN5","IAPS","LookNeg-vs-Baseline","train","GM","zscor","cv","pls","neoN5_IAPS_LookNeg-vs-Baseline_train_GM_zscor_cv_pls",0.211608569321786
+"neoN6","IAPS","LookNeg-vs-LookNeut","train","GM","cente","oob","rf","neoN6_IAPS_LookNeg-vs-LookNeut_train_GM_cente_oob_rf",0.215894472005292
+"NEONother","IAPS","LookNeg-vs-LookNeut","AHAB","GM","zscor","cv","svr","NEONother_IAPS_LookNeg-vs-LookNeut_full_GM_zscor_cv_svr",0.224230911415578
+"NEONX","PFA","Faces-vs-Shapes","AHAB","GM","zscor","oob","rf","NEONX_Faces-PFA_Faces-vs-Shapes_full_GM_zscor_oob_rf",0.169974762565754
+"PA","PFA","Faces-vs-Baseline","train","GM","nocen","oob","rf","PA_PFA_Faces-vs-Baseline_train_GM_nocen_oob_rf",0.116372188686042
+"STAI","IAPS","LookNeg-vs-Baseline","train","GM","cente","oob","rf","STAI_IAPS_LookNeg-vs-Baseline_train_GM_cente_oob_rf",0.247510622726416

@@ -1,2 +1,6 @@
 Data/
 .Rproj.user
+Results/holdOutModels/fullModelwithBootweights.mat
+Results/designFactors/RFmodel_designfactors.rds
+Preregistration.docx
+PatternMasks/Yarkoni_2013_Neurosynth_featureset1.mat
