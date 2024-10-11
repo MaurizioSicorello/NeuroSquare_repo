@@ -1,0 +1,10 @@
+name: ndesignshinyapp
+title:
+username: msicorello
+account: msicorello
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12333829
+bundleId: 8878773
+url: https://msicorello.shinyapps.io/ndesignshinyapp/
+version: 1
