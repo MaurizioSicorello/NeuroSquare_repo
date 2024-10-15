@@ -1,9 +1,4 @@
-Data/changData/
-Data/clinicalPatternExpression/
-Data/sourceDataAndDictionaries/
-Data/Subject-level-maps/
-Data/Maurizio_PIPAHABIAPS_2021-04-19
-Data/MediationData
+Data/
 .Rproj.user
 Results/holdOutModels/fullModelwithBootweights.mat
 Results/designFactors/RFmodel_designfactors.rds
