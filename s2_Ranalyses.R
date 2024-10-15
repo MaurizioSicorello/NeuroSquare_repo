@@ -1,3 +1,9 @@
+# Evaluates and plots the results from the machine learning analyses.
+
+# Also performs follow-up analyses on the final pattern and theory-driven analyses. If analyses are to be conducted from scratch,
+# scripts 3-5 have to be ran first. If not calculated from scratch, this script uses files from the Results folder and can be run right away 
+
+
 wd <- dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(wd)
 

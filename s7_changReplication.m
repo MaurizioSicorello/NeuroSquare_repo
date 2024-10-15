@@ -1,3 +1,9 @@
+% Calculates cross-validated within-person correlations of momentary
+% affective self-ratings during the task and a predictive pattern trained
+% with the same specifications as the between-person pattern for
+% vulnerability to stress
+
+
 %%%%%%%%%%%% 
 % PREPARE
 

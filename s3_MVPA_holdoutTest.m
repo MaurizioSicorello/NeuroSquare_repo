@@ -1,3 +1,7 @@
+% follow-up analyses on the final machine learning pattern. 
+
+% this files is needed to perform the neurosynth decoding analyses, but is
+% too large for github. Contact the authors for access to this file.
 which('Yarkoni_2013_Neurosynth_featureset1.mat')
 
 

@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Alternative approaches to predict neuroticism scores from brain data
+% Theory-driven approaches to predict neuroticism scores from brain data
 % (neural signatures, networks, and regions)
 
 

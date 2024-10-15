@@ -1,113 +1,13 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Alternative approaches to predict neuroticism scores from brain data
-% (neural signatures, networks, and regions)
-
+% exports used ROIs as niftis for plotting
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% load data
-cd('Data/Subject-level-maps')
-
-% example image for the paradigm of interest
-betaName = 'Subject_004_IAPS_LookNeg-vs-LookNeut.nii.gz';
-
-% locate image
-myfile = which(betaName);
-mydir = fileparts(myfile);
-if isempty(mydir), disp('Uh-oh! I can''t find the data.'), else disp('Data found.'), end
-
-% load IAPS files into fmri_data object
-image_names = filenames(fullfile(mydir, '*IAPS_LookNeg-vs-LookNeut.nii.gz'), 'absolute');
-IAPS_all = fmri_data(image_names);
-
-% make list of unpadded fMRI IDs
-[P, N, E] = cellfun(@fileparts, image_names, 'UniformOutput', false);
-id_fMRI = extractBetween(N, 9, 11);
-id_fMRI = str2double(id_fMRI);
-id_fMRI = array2table(id_fMRI, 'VariableNames', {'id'});
-IAPS_all.metadata_table.subject_id = id_fMRI;
-
-% load questionnaire data
-AHAB2_quest = readtable('../AHAB2_psychVars_deidentified');
-PIP_quest = readtable('../PIP_psychVars_deidentified');
-
-% merge data
-PIP_quest.Properties.VariableNames{find(string(PIP_quest.Properties.VariableNames) == "neoN")} = 'NEON';
-NEON_all = [AHAB2_quest(:,{'id', 'NEON'}); PIP_quest(:,{'id', 'NEON'})];
-fMRI_NEON = join(id_fMRI, NEON_all);
-
-%store Neuroticism in fmri_object and subset complete cases
-IAPS_all.Y = fMRI_NEON.NEON;
-completeCases = ~isnan(fMRI_NEON.NEON);
-IAPS_all_compl = get_wh_image(IAPS_all, completeCases);
-
-% extract descriptives
-AHAB2_quest.Properties.VariableNames{find(string(AHAB2_quest.Properties.VariableNames) == "YRS_SCH")} = 'Yr_School'
-deskrTab = join(IAPS_all_compl.metadata_table.subject_id, [AHAB2_quest(:,{'id', 'age','sex', 'race', 'NEON', 'Yr_School'}); PIP_quest(:,{'id', 'age','sex', 'race', 'NEON', 'Yr_School'})])
-
-round(mean(deskrTab.age),1)
-round(std(deskrTab.age),1)
-round(mean(deskrTab.NEON),1)
-round(std(deskrTab.NEON),1)
-round(mean(deskrTab.Yr_School),1)
-round(std(deskrTab.Yr_School),1)
-tabulate(deskrTab.race)
-tabulate(deskrTab.sex)
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% neural signature approach
-
-% load neural signatures
-cd('..\..\PatternMasks')
-pines = fmri_data('Rating_Weights_LOSO_2.nii');
-fearKragel = fmri_data('Kragelfearful.nii');
-angerKragel = fmri_data('Kragelangry.nii');
-sadnessKragel = fmri_data('Kragelsad.nii');
-fearFeng = fmri_data('VIFS.nii');
-cd('..\Data\Subject-level-maps')
-
-% dot product
-[bf01, r, p] = bf.corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, pines, 'pattern_expression', 'ignore_missing'))
-[bf01, r, p] = bf.corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, fearFeng, 'pattern_expression', 'ignore_missing'))
-[bf01, r, p] = bf.corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, fearKragel, 'pattern_expression', 'ignore_missing'))
-[bf01, r, p] = bf.corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, angerKragel, 'pattern_expression', 'ignore_missing'))
-[bf01, r, p] = bf.corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, sadnessKragel, 'pattern_expression', 'ignore_missing'))
-
-
-% check correlation matrix of Kragel patterns for CFA 
-patternExpressionMatrix = [apply_mask(IAPS_all_compl, fearKragel, 'pattern_expression', 'ignore_missing'), ...
-    apply_mask(IAPS_all_compl, angerKragel, 'pattern_expression', 'ignore_missing'), ...
-    apply_mask(IAPS_all_compl, sadnessKragel, 'pattern_expression', 'ignore_missing')];
-corr(patternExpressionMatrix) % low or strongly negative correlations. CFA doesn't make sense
-
-% cosine similarity
-[RHO, PVAL] = corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, pines, 'pattern_expression', 'ignore_missing', 'cosine_similarity'))
-[RHO, PVAL] = corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, fearKragel, 'pattern_expression', 'ignore_missing', 'cosine_similarity'))
-[RHO, PVAL] = corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, angerKragel, 'pattern_expression', 'ignore_missing', 'cosine_similarity'))
-[RHO, PVAL] = corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, sadnessKragel, 'pattern_expression', 'ignore_missing', 'cosine_similarity'))
-[RHO, PVAL] = corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, fearFeng, 'pattern_expression', 'ignore_missing', 'cosine_similarity'))
-
-% correlation similarity
-[RHO, PVAL] = corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, pines, 'pattern_expression', 'ignore_missing', 'correlation'))
-[RHO, PVAL] = corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, fearKragel, 'pattern_expression', 'ignore_missing', 'correlation'))
-[RHO, PVAL] = corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, angerKragel, 'pattern_expression', 'ignore_missing', 'correlation'))
-[RHO, PVAL] = corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, sadnessKragel, 'pattern_expression', 'ignore_missing', 'correlation'))
-[RHO, PVAL] = corr(IAPS_all_compl.Y, apply_mask(IAPS_all_compl, fearFeng, 'pattern_expression', 'ignore_missing', 'correlation'))
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% network approach
+% network maps
 
 % load network maps
 [bucknermaps, mapnames] = load_image_set('bucknerlab');
 
-% create matrix with activity within networks
-M = zeros(length(IAPS_all_compl.Y), length(mapnames));
 for i = 1:length(mapnames)
-    M(:,i) = extract_roi_averages(IAPS_all_compl, bucknermaps.get_wh_image(i)).dat;
-    mapnames(i)
-    [bf01, r, p] = bf.corr(IAPS_all_compl.Y, M(:,i))
+    write(get_wh_image(bucknermaps,i), 'fname', fullfile('PatternMasks', [mapnames{i}, '.nii']), 'overwrite')
 end
 
 % correlations between single networks and neuroticism
@@ -229,7 +129,6 @@ atlas_obj = load_atlas('canlab2018_2mm');
 % [encompassing all amygdala regions in the atlas]
 whole_amygdala = select_atlas_subset(atlas_obj, {'Amygdala'}, 'flatten');
 orthviews(whole_amygdala) % the spm toolbox amygdala ROI always struck me as very large
-write(whole_amygdala, 'fname', 'PatternMasks\amygdalaRoi.nii')
 whole_amygdala_split = split_atlas_by_hemisphere(whole_amygdala);
 
 % make dACC masks
@@ -238,13 +137,11 @@ dACC = select_atlas_subset(atlas_obj, {'Ctx_p32pr', 'Ctx_d32', 'Ctx_p32','Ctx_a3
 orthviews(dACC) % p32 is detached from the remaining subregions (already visible in Glasser (2016), Fig. S22)
 % make ROI without this subregion
 whole_dACC = select_atlas_subset(atlas_obj, {'Ctx_p32pr', 'Ctx_d32', 'Ctx_a32pr'}, 'flatten');
-write(whole_dACC, 'fname', 'PatternMasks\ACCRoi.nii')
 whole_dACC_split = split_atlas_by_hemisphere(whole_dACC);
 
 % make insula masks
 % anterior and middle insular regions from Glasser (2016) [maybe overinclusive?] 
 whole_insula = select_atlas_subset(atlas_obj, {'Ctx_MI_', 'Ctx_AVI','Ctx_AAIC'}, 'flatten');
-write(whole_insula, 'fname', 'PatternMasks\aInsRoi.nii')
 orthviews(whole_insula)
 whole_insula_split = split_atlas_by_hemisphere(whole_insula);
 

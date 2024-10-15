@@ -1,4 +1,4 @@
-% CHANGES WORKING DIRECTORY RELATIVE TO SCRIPT LOCATION!
+% Computes all machine learning models reported in the paper.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
