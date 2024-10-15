@@ -8,4 +8,6 @@ The main Analysis scripts are contained in the top Level Folder. To run them, yo
 
 The neuroimaging data will be shared via a neurovault link in this description upon the acceptance of the final paper. These files have to be donwloaded into a folder named "Subject-level-maps" within the Data-folder already existing in the current repository. If there is a published peer-reviewed paper, but you do not see a link here for some reason, please contact: maurizio.sicorello@zi-mannheim.de
 
+A brief description of the analyses scripts can be found on top of the respective script. In most cases, relative paths to the script location were used.
+
 
