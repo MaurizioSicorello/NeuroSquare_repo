@@ -1,6 +1,6 @@
 ## Project description
 
-This project contains the preregistration, data and analyses scripts of the the project "The functional neurobiology of negative affective traits across regions, networks, signatures, and a machine learning multiverse"
+This project contains the preregistration, data and analyses scripts for the paper "The functional neurobiology of dispositions towards negative emotions". An earlier preprint version can be found on biorxiv: https://doi.org/10.1101/2025.05.15.653674
 
 The Patterns predicting vulnerability to stress from the Training and the full data (Training + hold-out) can be found in "Results\holdOutModels" as neoN6_IAPS_LookNeg-vs-LookNeut_train_GM_cente_cv_svr.nii and neoN6_IAPS_LookNeg-vs-LookNeut_full_GM_cente_cv_svr.nii
 
