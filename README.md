@@ -6,5 +6,5 @@ The Patterns predicting vulnerability to stress from the Training and the full d
 
 The main Analysis scripts are contained in the top Level Folder. To run them, you need to download the canlab coretools Folder and the canlab_single_trials Folder from GitHub and put them on your matlab path. Also, you need to put the subfolder "Functions" on your path, which contains some custom functions for the present study.
 
-The neuroimaging data can be found on: https://identifiers.org/neurovault.collection:5802. To run the scripts, these files should be donwloaded into a folder named "Subject-level-maps" within the Data-folder that already existing in the current repository.
+The neuroimaging data can be found on: https://identifiers.org/neurovault.collection:5802. To run the scripts, these files should be downloaded into a folder named "Subject-level-maps" within the Data-folder that already existing in the current repository.
 
